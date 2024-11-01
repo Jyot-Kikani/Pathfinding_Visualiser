@@ -5,28 +5,6 @@ let isStartSelected = false;
 let isEndSelected = false;
 let startCell, endCell;
 
-// // Create the grid and add event listeners for each cell
-// for (let i = 0; i < rows * cols; i++) {
-//     const cell = document.createElement('div');
-//     cell.classList.add('cell');
-//     cell.addEventListener('click', () => handleCellClick(cell));
-//     grid.appendChild(cell);
-// }
-
-// function handleCellClick(cell) {
-//     if (!isStartSelected) {
-//         cell.classList.add('start');
-//         isStartSelected = true;
-//         startCell = cell;
-//     } else if (!isEndSelected && cell !== startCell) {
-//         cell.classList.add('end');
-//         isEndSelected = true;
-//         endCell = cell;
-//     } else if (cell !== startCell && cell !== endCell) {
-//         cell.classList.toggle('obstacle');
-//     }
-// }
-
 let isMouseDown = false;
 let isClearMode = false; // Flag to indicate whether the clear mode is active
 
@@ -123,16 +101,6 @@ document.getElementById('start-btn').addEventListener('click', () => {
         });
     }
 });
-
-// document.getElementById('reset-btn').addEventListener('click', resetGrid);
-
-// function resetGrid() {
-//     Array.from(grid.children).forEach(cell => {
-//         cell.classList.remove('obstacle', 'start', 'end', 'visited', 'path');
-//     });
-//     isStartSelected = false;
-//     isEndSelected = false;
-// }
 
 // Existing code for general reset
 document.getElementById('reset-btn').addEventListener('click', resetGrid);
