@@ -21,6 +21,18 @@
       <button id="reset-btn">Reset Grid</button>
       <button id="reset-path-btn">Reset Path</button>
     </div>
+
+    <div id="grid-size-controls">
+      <div class="input-container">
+        <label for="rows-input">Rows:</label>
+        <input type="number" id="rows-input" min="5" max="50" value="20" />
+        <label for="columns-input">Columns:</label>
+        <input type="number" id="columns-input" min="5" max="50" value="20" />
+      </div>
+      <button id="apply-grid-size-btn">Apply Grid Size</button>
+      <button id="rec-div-maze-btn">Generate Recursive Division Maze</button>
+      <div id="timer">Time Taken: 0 ms</div>
+    </div>
     <div id="grid"></div>
     <script src="script.js"></script>
   </body>
