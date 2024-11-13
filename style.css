@@ -1,171 +1,189 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    text-align: center;
-    margin: 0;
-    padding: 20px;
-    background-color: #e6f7ff; /* Softer, more pleasant background */
-    color: #333; /* Darker text color for better readability */
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 20px;
+  background-color: #e6f7ff; /* Softer, more pleasant background */
+  color: #333; /* Darker text color for better readability */
 }
 
 h1 {
-    margin-bottom: 20px;
-    font-size: 2.5em;
-    color: #0066cc; /* Deep blue for the title */
+  margin-bottom: 20px;
+  font-size: 2.5em;
+  color: #0066cc; /* Deep blue for the title */
 }
 
-#grid {
+/* #grid {
     display: grid;
     grid-template-columns: repeat(20, 30px);
     justify-content: center;
     margin: 20px auto;
-    gap: 2px; /* Slightly larger gap for better distinction */
-}
+    gap: 2px;
+}  */
 
 .cell {
-    width: 30px;
-    height: 30px;
-    background-color: #ffffff;
-    border-radius: 4px; /* Rounded corners for a modern look */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    transition: background-color 0.2s, transform 0.1s;
+  width: 30px;
+  height: 30px;
+  background-color: #ffffff;
+  border-radius: 4px; /* Rounded corners for a modern look */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s, transform 0.1s;
 }
 
 .cell:hover {
-    background-color: #d0d0d0;
-    transform: scale(1.05); /* Slight zoom effect */
+  background-color: #d0d0d0;
+  transform: scale(1.05); /* Slight zoom effect */
 }
 
 .cell.obstacle {
-    background-color: #333333;
+  background-color: #333333;
 }
 
 .cell.start {
-    background-color: #28a745; /* Brighter green */
-    outline: 2px solid #155724; /* Darker border for contrast */
+  background-color: #28a745; /* Brighter green */
+  outline: 2px solid #155724; /* Darker border for contrast */
 }
 
 .cell.end {
-    background-color: #dc3545; /* Brighter red */
-    outline: 2px solid #721c24; /* Darker border for contrast */
+  background-color: #dc3545; /* Brighter red */
+  outline: 2px solid #721c24; /* Darker border for contrast */
 }
 
 .cell.visited {
-    background-color: #90caf9; /* Lighter blue */
+  background-color: #90caf9; /* Lighter blue */
 }
 
 .cell.path {
-    background-color: #ffeb3b; /* Brighter yellow */
-    outline: 1px solid #bfa200; /* Darker yellow border */
+  background-color: #ffeb3b; /* Brighter yellow */
+  outline: 1px solid #bfa200; /* Darker yellow border */
 }
 
 .cell.waypoint {
-    background-color: orange; /* Or any other color to distinguish waypoints */
+  background-color: orange; /* Or any other color to distinguish waypoints */
 }
 
-
 button {
-    margin: 10px;
-    padding: 12px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    background-color: #007bff;
-    color: #ffffff;
-    cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.2s, transform 0.1s;
+  margin: 10px;
+  padding: 12px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s, transform 0.1s;
 }
 
 button:hover {
-    background-color: #0056b3;
-    transform: translateY(-2px); /* Lift effect */
+  background-color: #0056b3;
+  transform: translateY(-2px); /* Lift effect */
 }
 
 button:active {
-    background-color: #004085;
-    transform: translateY(0); /* Reset on click */
+  background-color: #004085;
+  transform: translateY(0); /* Reset on click */
 }
 
 .select-container {
-    position: relative;
-    display: inline-block;
-    width: 220px; /* Adjust as needed */
+  position: relative;
+  display: inline-block;
+  width: 220px; /* Adjust as needed */
 }
 
 .select-container select {
-    width: 100%;
-    padding: 12px 40px 12px 20px; /* Space for the custom arrow */
-    font-size: 16px;
-    border-radius: 8px;
-    border: 2px solid #007bff;
-    background-color: #ffffff;
-    color: #333;
-    cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: border-color 0.2s, box-shadow 0.2s;
-    appearance: none; /* Removes default arrow */
+  width: 100%;
+  padding: 12px 40px 12px 20px; /* Space for the custom arrow */
+  font-size: 16px;
+  border-radius: 8px;
+  border: 2px solid #007bff;
+  background-color: #ffffff;
+  color: #333;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none; /* Removes default arrow */
 }
 
 .select-container select:hover {
-    border-color: #0056b3;
+  border-color: #0056b3;
 }
 
 .select-container select:focus {
-    outline: none;
-    border-color: #004085;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  outline: none;
+  border-color: #004085;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 /* Custom arrow */
 .select-container::after {
-    content: '▼';
-    position: absolute;
-    top: 50%;
-    right: 15px;
-    transform: translateY(-50%);
-    color: #007bff;
-    pointer-events: none;
-    font-size: 12px;
+  content: "▼";
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  color: #007bff;
+  pointer-events: none;
+  font-size: 12px;
 }
 
 .input-container {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .input-container input[type="number"] {
-    width: 60px;
-    padding: 10px;
-    font-size: 1rem;
-    border-radius: 8px;
-    border: 2px solid #007bff;
-    color: #333;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    outline: none;
-    transition: border-color 0.2s;
+  width: 60px;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 2px solid #007bff;
+  color: #333;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s;
 }
 
 .input-container input[type="number"]:hover {
-    border-color: #0056b3;
+  border-color: #0056b3;
 }
 
 .input-container input[type="number"]:focus {
-    border-color: #004085;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  border-color: #004085;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 #timer {
-    display: inline;
-    width: fit-content;
-    margin: 10px;
-    padding: 12px 20px;
-    font-size: 16px;
-    border: 4px solid;
-    border-radius: 8px;
-    border-color: #007bff;
-    background-color: #ffffff;
-    /* cursor: pointer; */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: inline;
+  width: fit-content;
+  margin: 10px;
+  padding: 12px 20px;
+  font-size: 16px;
+  border: 4px solid;
+  border-radius: 8px;
+  border-color: #007bff;
+  background-color: #ffffff;
+  /* cursor: pointer; */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#grids-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 20px;
+}
+
+.grid-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+  gap: 1px;
+  width: fit-content;
+  margin-top: 10px;
 }

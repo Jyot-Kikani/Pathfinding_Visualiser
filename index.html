@@ -8,18 +8,10 @@
   <body>
     <h1>Pathfinding Visualizer</h1>
     <div id="controls">
-      <label for="algorithm-select">Choose Algorithm:</label>
-      <div class="select-container">
-        <select id="algorithm-select">
-          <option value="dijkstra">Dijkstra's Algorithm</option>
-          <option value="astar">A* Algorithm</option>
-          <option value="bfs">Breadth-First Search (BFS)</option>
-          <option value="dfs">Depth-First Search (DFS)</option>
-        </select>
-      </div>
-      <button id="start-btn">Start Pathfinding</button>
+      <button id="start-btn">Start Visualization</button>
       <button id="reset-btn">Reset Grid</button>
-      <button id="reset-path-btn">Reset Path</button>
+      <button id="reset-path-btn">Reset Paths Only</button>
+      <button id="rec-div-maze-btn">Generate Recursive Division Maze</button>
     </div>
 
     <div id="grid-size-controls">
@@ -30,10 +22,29 @@
         <input type="number" id="columns-input" min="5" max="50" value="20" />
       </div>
       <button id="apply-grid-size-btn">Apply Grid Size</button>
-      <button id="rec-div-maze-btn">Generate Recursive Division Maze</button>
       <div id="timer">Time Taken: 0 ms</div>
     </div>
-    <div id="grid"></div>
+    
+    <div id="grids-container">
+      <div class="grid-wrapper">
+        <h3>Dijkstra's Algorithm</h3>
+        <div id="grid-dijkstra" class="grid"></div>
+      </div>
+      <div class="grid-wrapper">
+        <h3>A* Algorithm</h3>
+        <div id="grid-astar" class="grid"></div>
+      </div>
+      <div class="grid-wrapper">
+        <h3>BFS Algorithm</h3>
+        <div id="grid-bfs" class="grid"></div>
+      </div>
+      <div class="grid-wrapper">
+        <h3>DFS Algorithm</h3>
+        <div id="grid-dfs" class="grid"></div>
+      </div>
+    </div>
+    <div id="timer">Time Taken: 0 ms</div>
+    <!-- <div id="grid"></div> -->
     <script src="script.js"></script>
   </body>
 </html>

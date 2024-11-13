@@ -1,34 +1,50 @@
-const grid = document.getElementById("grid");
-var rows = 20;
-var cols = 20;
-let isStartSelected = false;
-let isEndSelected = false;
-let startCell, endCell;
+let rows = 20;
+let cols = 20;
 
+  const grids = {
+    dijkstra: document.getElementById("grid-dijkstra"),
+    astar: document.getElementById("grid-astar"),
+    bfs: document.getElementById("grid-bfs"),
+    dfs: document.getElementById("grid-dfs"),
+  };
+
+const algorithms = ["dijkstra", "astar", "bfs", "dfs"];
+const isStartSelected = {};
+const isEndSelected = {};
+let startCells = {};
+let endCells = {};
 let isMouseDown = false;
-let isClearMode = false; // Flag to indicate whether the clear mode is active
+let isClearMode = false;
 
-// Add event listeners for keydown and keyup to toggle clear mode
+// Initialize flags and setup for each grid
+algorithms.forEach((alg) => {
+  isStartSelected[alg] = false;
+  isEndSelected[alg] = false;
+  startCells[alg] = null;
+  endCells[alg] = null;
+});
+
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Shift") {
-    isClearMode = true;
-  }
+  if (e.key === "Shift") isClearMode = true;
 });
 
 document.addEventListener("keyup", (e) => {
-  if (e.key === "Shift") {
-    isClearMode = false;
-  }
+  if (e.key === "Shift") isClearMode = false;
 });
 
-const gridElement = document.getElementById("grid");
-const rowsInput = document.getElementById("rows-input");
-const columnsInput = document.getElementById("columns-input");
-const applyGridSizeBtn = document.getElementById("apply-grid-size-btn");
+document.getElementById("apply-grid-size-btn").addEventListener("click", () => {
+  rows = parseInt(document.getElementById("rows-input").value, 10);
+  cols = parseInt(document.getElementById("columns-input").value, 10);
+  createGrids();
+});
 
-function createGrid() {
+document.getElementById("reset-btn").addEventListener("click", resetAllGrids);
+document.getElementById("reset-path-btn").addEventListener("click", resetAllPaths);
+
+function createGrid(gridElement, algorithm) {
+  console.log(gridElement);
   gridElement.style.gridTemplateColumns = `repeat(${cols}, 30px)`;
-  gridElement.innerHTML = ""; // Clear the existing grid
+  gridElement.innerHTML = "";
 
   for (let i = 0; i < rows * cols; i++) {
     const cell = document.createElement("div");
@@ -36,123 +52,127 @@ function createGrid() {
 
     cell.addEventListener("mousedown", () => {
       isMouseDown = true;
-      handleCellInteraction(cell);
+      handleCellInteraction(cell, algorithm);
     });
 
     cell.addEventListener("mousemove", () => {
-      if (isMouseDown) {
-        handleCellInteraction(cell);
-      }
+      if (isMouseDown) handleCellInteraction(cell, algorithm);
     });
 
-    cell.addEventListener("mouseup", () => {
-      isMouseDown = false;
-    });
+    cell.addEventListener("mouseup", () => (isMouseDown = false));
 
-    grid.appendChild(cell);
+    gridElement.appendChild(cell);
   }
 }
 
-// Initial grid setup
-createGrid(20, 20);
+function createGrids() {
+  algorithms.forEach((alg) => {
+    createGrid(grids[alg], alg);
+  });
+}
 
-// Apply new grid size when the button is clicked
-applyGridSizeBtn.addEventListener("click", () => {
-  rows = parseInt(rowsInput.value, 10);
-  cols = parseInt(columnsInput.value, 10);
-  createGrid();
-});
+createGrids();
 
-// Handle global mouseup event to stop dragging outside of grid cells
-document.addEventListener("mouseup", () => {
-  isMouseDown = false;
-});
-
+// Handle user interactions on any grid and reflect it across all grids
 function handleCellInteraction(cell) {
-  if (!isStartSelected) {
-    cell.classList.add("start");
-    isStartSelected = true;
-    startCell = cell;
-  } else if (!isEndSelected && cell !== startCell) {
-    cell.classList.add("end");
-    isEndSelected = true;
-    endCell = cell;
-  } else if (cell !== startCell && cell !== endCell) {
-    if (isClearMode) {
-      cell.classList.remove("obstacle");
-    } else {
-      cell.classList.add("obstacle");
-    }
-  }
-}
+  const cellIndex = Array.from(grids.dijkstra.children).indexOf(cell);
 
-document.getElementById("start-btn").addEventListener("click", () => {
-  resetPathOnly();
-  if (startCell && endCell) {
-    const startIdx = Array.from(grid.children).indexOf(startCell);
-    const endIdx = Array.from(grid.children).indexOf(endCell);
-    const algorithm = document.getElementById("algorithm-select").value;
+  // If the cell is not found in the grid, return early
+  if (cellIndex === -1) return;
 
-    let result;
-    startTimer(); // Start the timer before the algorithm
-    switch (algorithm) {
-      case "dijkstra":
-        result = dijkstra(grid.children, startIdx, endIdx, rows, cols);
-        break;
-      case "astar":
-        result = aStar(grid.children, startIdx, endIdx, rows, cols);
-        break;
-      case "bfs":
-        result = bfs(grid.children, startIdx, endIdx, rows, cols);
-        break;
-      case "dfs":
-        result = dfs(grid.children, startIdx, endIdx, rows, cols);
-        break;
-      default:
-        console.error("Invalid algorithm selected");
-        return;
-    }
-    stopTimer(); // Stop the timer after the algorithm finishes
-
-    const { visitedOrder, path } = result;
-
-    // Visualize visited nodes first
-    visualizeVisitedNodes(visitedOrder, () => {
-      if (
-        path.length === 0 ||
-        path[0] !== startIdx ||
-        path[path.length - 1] !== endIdx
-      ) {
-        alert("No path found from the start to the end node.");
-      } else {
-        visualizePath(path);
+  // If no start node is selected across all grids
+  if (!Object.values(isStartSelected).every(Boolean)) {
+    Object.keys(grids).forEach((alg) => {
+      const targetCell = grids[alg]?.children[cellIndex];
+      if (targetCell) {
+        targetCell.classList.add("start");
+        isStartSelected[alg] = true;
+        startCells[alg] = targetCell;
       }
     });
   }
+  // If no end node is selected across all grids and the clicked cell is not a start cell
+  else if (!Object.values(isEndSelected).every(Boolean) && !cell.classList.contains("start")) {
+    Object.keys(grids).forEach((alg) => {
+      const targetCell = grids[alg]?.children[cellIndex];
+      if (targetCell) {
+        targetCell.classList.add("end");
+        isEndSelected[alg] = true;
+        endCells[alg] = targetCell;
+      }
+    });
+  }
+  // Otherwise, toggle obstacle state
+  else {
+    const shouldRemoveObstacle = isClearMode;
+
+    Object.keys(grids).forEach((alg) => {
+      const targetCell = grids[alg]?.children[cellIndex];
+      if (targetCell && !targetCell.classList.contains("start") && !targetCell.classList.contains("end")) {
+        if (shouldRemoveObstacle) {
+          targetCell.classList.remove("obstacle");
+        } else {
+          targetCell.classList.add("obstacle");
+        }
+      }
+    });
+  }
+}
+
+
+
+
+// Reset all grids
+function resetAllGrids() {
+  algorithms.forEach((alg) => {
+    Array.from(grids[alg].children).forEach((cell) => {
+      cell.classList.remove("start", "end", "obstacle", "visited", "path");
+    });
+    isStartSelected[alg] = false;
+    isEndSelected[alg] = false;
+  });
+}
+
+// Reset paths only
+function resetAllPaths() {
+  algorithms.forEach((alg) => {
+    Array.from(grids[alg].children).forEach((cell) => {
+      cell.classList.remove("visited", "path");
+    });
+  });
+}
+
+// Start the visualization
+algorithms.forEach((alg) => {
+  document.getElementById("start-btn").addEventListener("click", () => {
+    if (startCells[alg] && endCells[alg]) {
+      const startIdx = Array.from(grids[alg].children).indexOf(startCells[alg]);
+      const endIdx = Array.from(grids[alg].children).indexOf(endCells[alg]);
+
+      let result;
+      switch (alg) {
+        case "dijkstra":
+          result = dijkstra(grids[alg].children, startIdx, endIdx, rows, cols);
+          break;
+        case "astar":
+          result = aStar(grids[alg].children, startIdx, endIdx, rows, cols);
+          break;
+        case "bfs":
+          result = bfs(grids[alg].children, startIdx, endIdx, rows, cols);
+          break;
+        case "dfs":
+          result = dfs(grids[alg].children, startIdx, endIdx, rows, cols);
+          break;
+      }
+
+      const { visitedOrder, path } = result;
+      visualizeVisitedNodes(grids[alg].children, visitedOrder, () => {
+        visualizePath(grids[alg].children, path);
+      });
+    }
+  });
 });
 
-// Existing code for general reset
-document.getElementById("reset-btn").addEventListener("click", resetGrid);
-
-// New code for path-only reset
-document
-  .getElementById("reset-path-btn")
-  .addEventListener("click", resetPathOnly);
-
-function resetGrid() {
-  Array.from(grid.children).forEach((cell) => {
-    cell.classList.remove("obstacle", "start", "end", "visited", "path");
-  });
-  isStartSelected = false;
-  isEndSelected = false;
-}
-
-// New function to reset only the path and visited cells
-function resetPathOnly() {
-  Array.from(grid.children).forEach((cell) => {
-    cell.classList.remove("visited", "path");
-  });
-}
 
 // Dijkstra's Algorithm
 function dijkstra(cells, startIdx, endIdx, rows, cols) {
@@ -200,19 +220,19 @@ function dijkstra(cells, startIdx, endIdx, rows, cols) {
   return { visitedOrder, path: path.reverse() };
 }
 
-let startTime, endTime;
+// let startTime, endTime;
 
-// Function to start the timer
-function startTimer() {
-  startTime = performance.now(); // Capture the start time
-}
+// // Function to start the timer
+// function startTimer() {
+//   startTime = performance.now(); // Capture the start time
+// }
 
-// Function to stop the timer and show the elapsed time
-function stopTimer() {
-  endTime = performance.now(); // Capture the end time
-  const elapsedTime = (endTime - startTime).toFixed(2); // Calculate time in milliseconds
-  document.getElementById("timer").innerText = `Time Taken: ${elapsedTime} ms`; // Display time
-}
+// // Function to stop the timer and show the elapsed time
+// function stopTimer() {
+//   endTime = performance.now(); // Capture the end time
+//   const elapsedTime = (endTime - startTime).toFixed(2); // Calculate time in milliseconds
+//   document.getElementById("timer").innerText = `Time Taken: ${elapsedTime} ms`; // Display time
+// }
 
 // A Star
 function aStar(cells, startIdx, endIdx, rows, cols) {
@@ -361,16 +381,17 @@ function getNeighbors(idx, rows, cols) {
   return neighbors.filter((n) => n >= 0 && n < rows * cols);
 }
 
-function visualizeVisitedNodes(visitedOrder, callback) {
+function visualizeVisitedNodes(grid, visitedOrder, callback) {
   visitedOrder.forEach((idx, i) => {
     setTimeout(() => {
-      const cell = grid.children[idx];
+      const cell = grid[idx];
       if (
         !cell.classList.contains("start") &&
         !cell.classList.contains("end")
       ) {
         cell.classList.add("visited");
       }
+      // When the last node is reached, call the callback to show the path
       if (i === visitedOrder.length - 1 && callback) {
         setTimeout(callback, 500); // Delay before showing the path
       }
@@ -378,13 +399,21 @@ function visualizeVisitedNodes(visitedOrder, callback) {
   });
 }
 
-function visualizePath(path) {
+
+function visualizePath(grid, path) {
   path.forEach((idx, i) => {
     setTimeout(() => {
-      grid.children[idx].classList.add("path");
-    }, i * 100);
+      const cell = grid[idx];
+      if (
+        !cell.classList.contains("start") &&
+        !cell.classList.contains("end")
+      ) {
+        cell.classList.add("path");
+      }
+    }, i * 50);
   });
 }
+
 
 document.getElementById("rec-div-maze-btn").addEventListener("click", () => {
   generateMazeRecursiveDivision(0, 0, cols, rows);
@@ -397,18 +426,25 @@ function generateMazeRecursiveDivision(
   height = rows,
   minSize = 4
 ) {
-  resetGrid(); // Clear previous grid
+  resetAllGrids(); // Clear previous grid
 
+  // Helper function to apply obstacle to all grids
+  function addObstacleToAllGrids(cellIndex) {
+    Object.values(grids).forEach((grid) => {
+      const cell = grid.children[cellIndex];
+      if (cell) {
+        cell.classList.add("obstacle");
+      }
+    });
+  }
+
+  // Recursive function to divide the grid
   function divide(x, y, width, height, orientation) {
-    // Base case: Stop dividing if width or height is too small
     if (width < minSize || height < minSize) return;
-
-    // Randomly skip creating some divisions to create more open spaces
-    // if (Math.random() < 0.05) return;
 
     const horizontal = orientation === "horizontal";
 
-    // Choose a random point to place the wall within the allowable bounds
+    // Choose a random point to place the wall
     const wx = x + (horizontal ? 0 : Math.floor(Math.random() * (width - 2)));
     const wy = y + (horizontal ? Math.floor(Math.random() * (height - 2)) : 0);
 
@@ -416,20 +452,28 @@ function generateMazeRecursiveDivision(
     const px = wx + (horizontal ? Math.floor(Math.random() * width) : 0);
     const py = wy + (horizontal ? 0 : Math.floor(Math.random() * height));
 
-    // Determine wall direction and length
     const dx = horizontal ? 1 : 0;
     const dy = horizontal ? 0 : 1;
 
-    // Randomize the wall length to reduce density
     const length = horizontal ? width : height;
     const wallLength = Math.floor(length * (0.6 + Math.random() * 0.4));
 
     // Draw the wall with a gap
     for (let i = 0; i < length; i++) {
-      // Randomly skip some wall cells to create larger gaps
-      if ((wx + i * dx !== px || wy + i * dy !== py) && Math.random() > 0.2) {
-        const idx = (wy + i * dy) * cols + (wx + i * dx);
-        grid.children[idx].classList.add("obstacle");
+      const wxIdx = wx + i * dx;
+      const wyIdx = wy + i * dy;
+
+      // Skip the gap point and ensure we are within bounds
+      if (
+        (wxIdx !== px || wyIdx !== py) &&
+        wxIdx >= 0 &&
+        wxIdx < cols &&
+        wyIdx >= 0 &&
+        wyIdx < rows &&
+        Math.random() > 0.2
+      ) {
+        const cellIndex = wyIdx * cols + wxIdx;
+        addObstacleToAllGrids(cellIndex);
       }
     }
 
@@ -448,6 +492,7 @@ function generateMazeRecursiveDivision(
     divide(nx2, ny2, w2, h2, chooseOrientation(w2, h2));
   }
 
+  // Determines whether to divide horizontally or vertically
   function chooseOrientation(width, height) {
     if (width < height) return "horizontal";
     if (height < width) return "vertical";
