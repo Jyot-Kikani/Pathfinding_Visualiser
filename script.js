@@ -1,12 +1,12 @@
 let rows = 20;
 let cols = 20;
 
-  const grids = {
-    dijkstra: document.getElementById("grid-dijkstra"),
-    astar: document.getElementById("grid-astar"),
-    bfs: document.getElementById("grid-bfs"),
-    dfs: document.getElementById("grid-dfs"),
-  };
+const grids = {
+  dijkstra: document.getElementById("grid-dijkstra"),
+  astar: document.getElementById("grid-astar"),
+  bfs: document.getElementById("grid-bfs"),
+  dfs: document.getElementById("grid-dfs"),
+};
 
 const algorithms = ["dijkstra", "astar", "bfs", "dfs"];
 const isStartSelected = {};
@@ -39,7 +39,9 @@ document.getElementById("apply-grid-size-btn").addEventListener("click", () => {
 });
 
 document.getElementById("reset-btn").addEventListener("click", resetAllGrids);
-document.getElementById("reset-path-btn").addEventListener("click", resetAllPaths);
+document
+  .getElementById("reset-path-btn")
+  .addEventListener("click", resetAllPaths);
 
 function createGrid(gridElement, algorithm) {
   console.log(gridElement);
@@ -92,7 +94,10 @@ function handleCellInteraction(cell) {
     });
   }
   // If no end node is selected across all grids and the clicked cell is not a start cell
-  else if (!Object.values(isEndSelected).every(Boolean) && !cell.classList.contains("start")) {
+  else if (
+    !Object.values(isEndSelected).every(Boolean) &&
+    !cell.classList.contains("start")
+  ) {
     Object.keys(grids).forEach((alg) => {
       const targetCell = grids[alg]?.children[cellIndex];
       if (targetCell) {
@@ -108,7 +113,11 @@ function handleCellInteraction(cell) {
 
     Object.keys(grids).forEach((alg) => {
       const targetCell = grids[alg]?.children[cellIndex];
-      if (targetCell && !targetCell.classList.contains("start") && !targetCell.classList.contains("end")) {
+      if (
+        targetCell &&
+        !targetCell.classList.contains("start") &&
+        !targetCell.classList.contains("end")
+      ) {
         if (shouldRemoveObstacle) {
           targetCell.classList.remove("obstacle");
         } else {
@@ -118,9 +127,6 @@ function handleCellInteraction(cell) {
     });
   }
 }
-
-
-
 
 // Reset all grids
 function resetAllGrids() {
@@ -152,16 +158,24 @@ algorithms.forEach((alg) => {
       let result;
       switch (alg) {
         case "dijkstra":
+          startTimer();
           result = dijkstra(grids[alg].children, startIdx, endIdx, rows, cols);
+          stopTimer(alg);
           break;
         case "astar":
+          startTimer();
           result = aStar(grids[alg].children, startIdx, endIdx, rows, cols);
+          stopTimer(alg);
           break;
         case "bfs":
+          startTimer();
           result = bfs(grids[alg].children, startIdx, endIdx, rows, cols);
+          stopTimer(alg);
           break;
         case "dfs":
+          startTimer();
           result = dfs(grids[alg].children, startIdx, endIdx, rows, cols);
+          stopTimer(alg);
           break;
       }
 
@@ -172,7 +186,6 @@ algorithms.forEach((alg) => {
     }
   });
 });
-
 
 // Dijkstra's Algorithm
 function dijkstra(cells, startIdx, endIdx, rows, cols) {
@@ -220,19 +233,27 @@ function dijkstra(cells, startIdx, endIdx, rows, cols) {
   return { visitedOrder, path: path.reverse() };
 }
 
-// let startTime, endTime;
+// Function to start the timer
+function startTimer() {
+  startTime = performance.now(); // Capture the start time
+}
 
-// // Function to start the timer
-// function startTimer() {
-//   startTime = performance.now(); // Capture the start time
-// }
+// Function to stop the timer and show the elapsed time
+function stopTimer(currGridKey) {
+  const endTime = performance.now(); // Capture the end time
+  const elapsedTime = (endTime - startTime).toFixed(2); // Calculate time in milliseconds
 
-// // Function to stop the timer and show the elapsed time
-// function stopTimer() {
-//   endTime = performance.now(); // Capture the end time
-//   const elapsedTime = (endTime - startTime).toFixed(2); // Calculate time in milliseconds
-//   document.getElementById("timer").innerText = `Time Taken: ${elapsedTime} ms`; // Display time
-// }
+  // Get the grid wrapper for the current grid using the key
+  const currGridWrapper = grids[currGridKey].closest('.grid-wrapper');
+  console.log(currGridWrapper);
+  if (currGridWrapper) {
+    // Find the timer div inside the grid-info-wrapper within the grid wrapper
+    const timerDiv = currGridWrapper.querySelector(".grid-info-wrapper .timer");
+    if (timerDiv) {
+      timerDiv.innerText = `Time Taken: ${elapsedTime} ms`; // Display time
+    }
+  }
+}
 
 // A Star
 function aStar(cells, startIdx, endIdx, rows, cols) {
@@ -399,7 +420,6 @@ function visualizeVisitedNodes(grid, visitedOrder, callback) {
   });
 }
 
-
 function visualizePath(grid, path) {
   path.forEach((idx, i) => {
     setTimeout(() => {
@@ -413,7 +433,6 @@ function visualizePath(grid, path) {
     }, i * 50);
   });
 }
-
 
 document.getElementById("rec-div-maze-btn").addEventListener("click", () => {
   generateMazeRecursiveDivision(0, 0, cols, rows);
